@@ -91,7 +91,6 @@ def callback_lance_realizado(ch, method, properties, body):
         print(f"MS Lance: Lance de {id_usuario} no leilão {id_leilao_realizado} de R${valor_lance} é VÁLIDO.")
         maiores_lances[id_leilao_realizado] = {"id_usuario": id_usuario, "valor": valor_lance}
         
-        # Publica evento de lance validado
         channel = utils.get_rabbitmq_channel()
         channel.basic_publish(
             exchange='',

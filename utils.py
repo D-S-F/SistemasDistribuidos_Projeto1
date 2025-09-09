@@ -22,11 +22,13 @@ def setup_queues(channel):
     channel.exchange_declare(exchange='notificacao_leilao', exchange_type='topic')
 
 def generate_keys():
+    """Gera chaves pública e privada de acordo com o ID do processo cliente"""
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     public_key = private_key.public_key()
     return private_key, public_key
 
 def sign_message(private_key, message):
+    """Cria uma assinatura para a mensagem com um hex"""
     if isinstance(message, dict):
         message = json.dumps(message, sort_keys=True).encode('utf-8')
         

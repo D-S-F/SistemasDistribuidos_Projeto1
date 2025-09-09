@@ -4,12 +4,6 @@ import json
 import threading
 import os
 
-# Formato lance
-# {"ID do leilao": id, 
-# "ID do usuario": id,
-# "valor": valor do lance,
-# "assinatura": ass}
-
 PUBLIC_KEYS_DIR = 'public_keys'
 
 class ClienteLeilao:
@@ -50,7 +44,7 @@ class ClienteLeilao:
         )
         print(f"Lance de R${valor} enviado para o leilão {id_leilao}.")
         
-        # Se for o primeiro lance neste leilão, começa a ouvir notificações
+
         if id_leilao not in self.leiloes_interessado:
             self.checar_notif_leilao(id_leilao)
             self.leiloes_interessado.add(id_leilao)
@@ -68,17 +62,14 @@ class ClienteLeilao:
                 leilao_id = data.get('id_leilao')
                 if leilao_id:
                     self.leiloes_disponiveis[leilao_id] = data
-                    print(f"\n[NOVO LEILÃO] ID: {leilao_id} - {data.get('descricao')}")
-                    # Aqui você pode adicionar a lógica para ouvir notificações específicas se necessário
+                    print(f"\nNovo leião disponível! ID: {leilao_id} | {data.get('descricao')}")
             except json.JSONDecodeError:
-                print(f" [!] Erro ao decodificar JSON: {body}")
-            #ch.basic_ack(deliery_tag=method.delivery_tag)
-        
+                print(f"Erro ao decodificar JSON") 
         
         result = channel.queue_declare(queue='', exclusive=True)
         queue_name_iniciado = result.method.queue
         channel.queue_bind(exchange='leilao_iniciado', queue=queue_name_iniciado)
-        channel.basic_consume(queue=queue_name_iniciado, on_message_callback=callback_novo_leilao)
+        channel.basic_consume(queue=queue_name_iniciado, on_message_callback=callback_novo_leilao, auto_ack=True)
         th_lance = threading.Thread(target=channel.start_consuming, daemon=True)
         th_lance.start()
 
@@ -104,7 +95,7 @@ class ClienteLeilao:
                 print(f"Novo lance foi realizado!\nUsuário: {data['id_usuario']}, Valor: R${data['valor']}.")
             print("---------------------------------")
         def consume_thread():
-            channel.basic_consume(queue=queue_name, on_message_callback=callback_notificacao)
+            channel.basic_consume(queue=queue_name, on_message_callback=callback_notificacao, auto_ack=True)
             channel.start_consuming()
         
         th_notif = threading.Thread(target=consume_thread, daemon=True)
