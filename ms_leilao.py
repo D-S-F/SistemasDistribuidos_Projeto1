@@ -15,8 +15,8 @@ class MSLeilao:
         self.leiloes = {
             "leilao_001": {
                 "descricao": "iPhone 15 Pro Max 256GB - Azul Titânio",
-                "inicio": datetime.datetime(2025, 9, 8, 18, 45, 0),  # 15/01/2024 14:00
-                "fim": datetime.datetime(2025, 9, 8, 18, 47, 0),    # 15/01/2024 16:00
+                "inicio": datetime.datetime(2025, 9, 9, 10, 10, 0),  # 15/01/2024 14:00
+                "fim": datetime.datetime.now() + datetime.timedelta(seconds=80),    # 15/01/2024 16:00
                 "status": "agendado"
             },
             "leilao_002": {
@@ -41,12 +41,6 @@ class MSLeilao:
                 "descricao": "Nintendo Switch OLED + 5 Jogos Exclusivos",
                 "inicio": datetime.datetime(2024, 1, 19, 19, 0, 0),  # 19/01/2024 19:00
                 "fim": datetime.datetime(2024, 1, 19, 21, 0, 0),     # 19/01/2024 21:00
-                "status": "agendado"
-            },
-            "leilao_006": {
-                "descricao": "sla é um teste mr stec",
-                "inicio": datetime.datetime(2025, 1, 19, 19, 0, 0),  # 19/01/2024 19:00
-                "fim": datetime.datetime(2025, 11, 19, 21, 0, 0),     # 19/01/2024 21:00
                 "status": "agendado"
             }
         }

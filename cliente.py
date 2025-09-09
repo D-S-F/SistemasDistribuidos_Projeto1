@@ -89,7 +89,7 @@ class ClienteLeilao:
             notif_id_leilao = data.get('id_leilao')
             print(f"\n--- NOTIFICAÇÃO DO LEILÃO {notif_id_leilao} ---")
             if "id_vencedor" in data:
-                print(f"||LEILÃO ENCERRADO!||\nVencedor: {data['id_vencedor']} com R${data['valor_negociado']}.")
+                print(f"||LEILÃO ENCERRADO!||\nVencedor: {data['id_vencedor']} com R${data['valor']}.")
                 self.leiloes_disponiveis.pop(notif_id_leilao)
             else:
                 print(f"Novo lance foi realizado!\nUsuário: {data['id_usuario']}, Valor: R${data['valor']}.")
