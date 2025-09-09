@@ -42,6 +42,12 @@ class MSLeilao:
                 "inicio": datetime.datetime(2024, 1, 19, 19, 0, 0),  # 19/01/2024 19:00
                 "fim": datetime.datetime(2024, 1, 19, 21, 0, 0),     # 19/01/2024 21:00
                 "status": "agendado"
+            },
+            "leilao_006": {
+                "descricao": "sla é um teste mr stec",
+                "inicio": datetime.datetime(2025, 1, 19, 19, 0, 0),  # 19/01/2024 19:00
+                "fim": datetime.datetime(2025, 11, 19, 21, 0, 0),     # 19/01/2024 21:00
+                "status": "agendado"
             }
         }
         
@@ -73,10 +79,9 @@ class MSLeilao:
         
         # Publica o evento na fila
         self.channel.basic_publish(
-            exchange='',
-            routing_key='leilao_iniciado',
+            exchange='leilao_iniciado',
+            routing_key='',
             body=json.dumps(evento),
-            properties=pika.BasicProperties(delivery_mode=2)  # Torna a mensagem persistente
         )
         
         print(f"✅ Leilão {id_leilao} iniciado: {leilao['descricao']}")

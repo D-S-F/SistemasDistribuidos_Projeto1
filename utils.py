@@ -3,6 +3,7 @@ import json
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.exceptions import InvalidSignature
+import os
 
 HOST = 'localhost'
 
@@ -11,12 +12,15 @@ def get_rabbitmq_channel():
     return connection.channel()
 
 def setup_queues(channel):
-    channel.queue_declare(queue='leilao_iniciado', durable=True)
+    #channel.queue_declare(queue='leilao_iniciado', durable=True)
     channel.queue_declare(queue='lance_realizado', durable=True)
     channel.queue_declare(queue='leilao_finalizado', durable=True)
     channel.queue_declare(queue='lance_validado', durable=True)
     channel.queue_declare(queue='leilao_vencedor', durable=True)
     
+    channel.exchange_declare(exchange='leilao_iniciado', exchange_type='fanout')
+    channel.exchange_declare(exchange='notificacao_leilao', exchange_type='topic')
+
 def generate_keys():
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     public_key = private_key.public_key()
@@ -64,3 +68,26 @@ def serialize_public_key(public_key):
 def deserialize_public_key(pem_data):
     """Converte uma chave pública do formato PEM de volta para um objeto."""
     return serialization.load_pem_public_key(pem_data)
+
+def save_key_to_file(key, filename):
+    """Salva uma chave (pública ou privada) em um arquivo no formato PEM."""
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    
+    pem = None
+    if isinstance(key, rsa.RSAPublicKey):
+        pem = key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+    if pem:
+        with open(filename, 'wb') as pem_out:
+            pem_out.write(pem)
+
+def load_public_key_from_file(filename):
+    """Carrega uma chave pública de um arquivo PEM."""
+    if not os.path.exists(filename):
+        return None
+    with open(filename, 'rb') as pem_in:
+        pem_data = pem_in.read()
+        return serialization.load_pem_public_key(pem_data)

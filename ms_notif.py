@@ -23,17 +23,18 @@ class MSNotificacao:
         # As filas específicas por leilão serão criadas dinamicamente
         print("✅ Filas de entrada configuradas!")
     
-    def criar_fila_leilao(self, id_leilao: str):
-        """Cria uma fila específica para um leilão se ela não existir"""
-        nome_fila = f"leilao_{id_leilao}"
-        self.channel.queue_declare(queue=nome_fila, durable=True)
-        return nome_fila
+    # def criar_fila_leilao(self, id_leilao: str):
+    #     """Cria uma fila específica para um leilão se ela não existir"""
+    #     nome_fila = f"leilao_{id_leilao}"
+    #     self.channel.queue_declare(queue=nome_fila, durable=True)
+    #     return nome_fila
     
     def processar_lance_validado(self, ch, method, properties, body):
         """Processa eventos de lance validado"""
         try:
             evento = json.loads(body)
             id_leilao = evento.get('id_leilao')
+            queue_key = f"leilao.{id_leilao}"
             
             if not id_leilao:
                 print("❌ Erro: ID do leilão não encontrado no evento lance_validado")
@@ -41,18 +42,17 @@ class MSNotificacao:
                 return
             
             # Cria fila específica para o leilão
-            fila_leilao = self.criar_fila_leilao(id_leilao)
+            #fila_leilao = self.criar_fila_leilao(id_leilao)
             
             # Adiciona timestamp ao evento
-            evento['timestamp'] = time.time()
-            evento['tipo'] = 'lance_validado'
+            #evento['timestamp'] = time.time()
+            #evento['tipo'] = 'lance_validado'
             
             # Publica na fila específica do leilão
             self.channel.basic_publish(
-                exchange='',
-                routing_key=fila_leilao,
+                exchange='notificacao_leilao',
+                routing_key=queue_key,
                 body=json.dumps(evento),
-                properties=pika.BasicProperties(delivery_mode=2)
             )
             
             print(f"📢 Lance validado roteado para leilão {id_leilao}")
@@ -71,6 +71,7 @@ class MSNotificacao:
         try:
             evento = json.loads(body)
             id_leilao = evento.get('id_leilao')
+            queue_key = f"leilao.{id_leilao}"
             
             if not id_leilao:
                 print("❌ Erro: ID do leilão não encontrado no evento leilao_vencedor")
@@ -78,18 +79,17 @@ class MSNotificacao:
                 return
             
             # Cria fila específica para o leilão
-            fila_leilao = self.criar_fila_leilao(id_leilao)
+            #fila_leilao = self.criar_fila_leilao(id_leilao)
             
             # Adiciona timestamp ao evento
-            evento['timestamp'] = time.time()
-            evento['tipo'] = 'leilao_vencedor'
+            #evento['timestamp'] = time.time()
+            #evento['tipo'] = 'leilao_vencedor'
             
             # Publica na fila específica do leilão
             self.channel.basic_publish(
-                exchange='',
-                routing_key=fila_leilao,
+                exchange='notificacao_leilao',
+                routing_key=queue_key,
                 body=json.dumps(evento),
-                properties=pika.BasicProperties(delivery_mode=2)
             )
             
             print(f"🏆 Leilão vencedor roteado para leilão {id_leilao}")
